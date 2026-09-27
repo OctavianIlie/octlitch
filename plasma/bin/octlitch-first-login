@@ -8,6 +8,9 @@ fi
 
 mkdir -p "$HOME/.config"
 
-plasma-apply-lookandfeel --apply org.octlitch.desktop
+plasma-apply-lookandfeel --apply org.octlitch.valley.desktop
+
+plasma-apply-wallpaperimage \
+  /usr/share/wallpapers/OctlitchValley/contents/images/artificial-valley.jpg
 
 touch "$MARKER"
