@@ -1,0 +1,42 @@
+# Fedora/base images
+iso/input/*.iso
+
+# Generated ISO output
+iso/output/*.iso
+
+# Build workspace
+iso/work/rootfs/
+iso/work/iso-tree/
+iso/work/boot-images/
+iso/work/*.erofs
+iso/work/*.img
+iso/work/*.iso
+
+# VM disks
+*.qcow2
+*.raw
+*.vdi
+*.vmdk
+
+# RPM build products
+*.rpm
+*.src.rpm
+BUILD/
+BUILDROOT/
+RPMS/
+SRPMS/
+
+# Secrets
+*.key
+*.pem
+*.p12
+*.pfx
+.env
+secrets/
+credentials/
+
+# Misc
+*.swp
+*~
+.DS_Store
+__pycache__/
