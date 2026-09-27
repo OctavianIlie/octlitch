@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Octlitch First Login Setup
+Exec=/usr/local/bin/octlitch-first-login
+OnlyShowIn=KDE;
+X-KDE-autostart-after=panel

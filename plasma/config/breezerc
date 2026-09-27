@@ -1,0 +1,10 @@
+[Common]
+ShadowStrength=120
+
+[Style]
+MenuOpacity=98
+ToolTipOpacity=98
+
+[Windeco]
+ButtonSize=Small
+OutlineCloseButton=false

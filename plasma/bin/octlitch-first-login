@@ -1,0 +1,13 @@
+#!/bin/bash
+
+MARKER="$HOME/.config/octlitch-first-login-done"
+
+if [ -f "$MARKER" ]; then
+    exit 0
+fi
+
+mkdir -p "$HOME/.config"
+
+plasma-apply-lookandfeel --apply org.octlitch.desktop
+
+touch "$MARKER"
