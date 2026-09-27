@@ -1,0 +1,125 @@
+#!/usr/bin/sh
+#
+# live-kde: kde specific setup for livesys
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+
+# set up autologin for user liveuser
+if $(rpm -q plasma-mobile > /dev/null 2>&1) ; then
+  DEFAULT_DESKTOP="plasma-mobile.desktop"
+  IS_MOBILE=1
+else
+  DEFAULT_DESKTOP="plasma.desktop"
+  IS_MOBILE=0
+fi
+if $(rpm -q plasma-login-manager > /dev/null 2>&1) ; then
+  LOGIN_MANAGER_CONFIG="/etc/plasmalogin.conf"
+else
+  LOGIN_MANAGER_CONFIG="/etc/sddm.conf"
+fi
+if [ -f "${LOGIN_MANAGER_CONFIG}" ]; then
+sed -i 's/^#User=.*/User=liveuser/' ${LOGIN_MANAGER_CONFIG}
+sed -i "s/^#Session=.*/Session=${DEFAULT_DESKTOP}/" ${LOGIN_MANAGER_CONFIG}
+else
+cat > ${LOGIN_MANAGER_CONFIG} << LGNMGR_EOF
+[Autologin]
+User=liveuser
+Session=${DEFAULT_DESKTOP}
+LGNMGR_EOF
+fi
+
+# Inhibit Plasma Setup
+touch /etc/plasma-setup-done
+
+# add liveinst.desktop to favorites menu
+mkdir -p /home/liveuser/.config/
+cat > /home/liveuser/.config/kickoffrc << MENU_EOF
+[Favorites]
+FavoriteURLs=/usr/share/applications/org.kde.dolphin.desktop,/usr/share/applications/systemsettings.desktop,/usr/share/applications/org.kde.konsole.desktop,/usr/share/applications/liveinst.desktop
+MENU_EOF
+
+# show liveinst.desktop on desktop and in menu
+mkdir -p /home/liveuser/.local/share/applications/
+cp /usr/share/applications/liveinst.desktop /home/liveuser/.local/share/applications/
+sed -i 's/NoDisplay=true/NoDisplay=false/' /home/liveuser/.local/share/applications/liveinst.desktop
+# set executable bit disable KDE security warning
+chmod +x /home/liveuser/.local/share/applications/liveinst.desktop
+mkdir /home/liveuser/Desktop
+cp -a /home/liveuser/.local/share/applications/liveinst.desktop /home/liveuser/Desktop/
+
+if [ ${IS_MOBILE} -eq 1 ] ; then
+# add liveinst.desktop to mobile desktop
+mkdir -p /usr/share/plasma/look-and-feel/org.kde.breeze.mobile/contents/plasmoidsetupscripts/
+cat > /usr/share/plasma/look-and-feel/org.kde.breeze.mobile/contents/plasmoidsetupscripts/org.kde.plasma.mobile.homescreen.folio.js << APPLETSRC_EOF
+applet.writeConfig("Pages", "[[{\"column\":1,\"row\":1,\"storageId\":\"liveinst.desktop\",\"type\":\"application\"}]]");
+applet.reloadConfig();
+APPLETSRC_EOF
+# Clean up the liveinst.desktop after install
+cat > /usr/share/anaconda/post-scripts/80-cleanmobile.ks << CLEANAPPLET_EOF
+%post
+
+echo "Cleanup liveinst.desktop from mobile"
+rm -f /usr/share/plasma/look-and-feel/org.kde.breeze.mobile/contents/plasmoidsetupscripts/org.kde.plasma.mobile.homescreen.folio.js
+
+%end
+CLEANAPPLET_EOF
+
+fi
+
+# make kwin react to org.freedesktop.locale1 changes for Anaconda
+# https://pagure.io/fedora-kde/SIG/issue/504
+cat > /home/liveuser/.config/kwinrc << KWINRC_EOF
+[Wayland]
+FollowLocale1=true
+KWINRC_EOF
+
+# For Plasma 6, set up plasma welcome for the live environment
+if [ ! -f /etc/xdg/autostart/org.kde.plasma-welcome.desktop ]; then
+cat > /home/liveuser/.config/plasma-welcomerc << KDEWELCOME_EOF
+[General]
+LiveEnvironment=true
+LiveInstaller=liveinst
+KDEWELCOME_EOF
+else
+# For Plasma 5 plasma-welcome, disable auto-starting
+# Cf. https://bugs.kde.org/show_bug.cgi?id=466282
+rm -f /etc/xdg/autostart/org.kde.plasma-welcome.desktop
+fi
+
+# Set akonadi backend
+mkdir -p /home/liveuser/.config/akonadi
+cat > /home/liveuser/.config/akonadi/akonadiserverrc << AKONADI_EOF
+[%General]
+Driver=QSQLITE3
+AKONADI_EOF
+
+# Disable plasma-discover-notifier
+mkdir -p /home/liveuser/.config/autostart
+
+# Disable baloo
+cat > /home/liveuser/.config/baloofilerc << BALOO_EOF
+[Basic Settings]
+Indexing-Enabled=false
+BALOO_EOF
+
+# Disable kres-migrator
+cat > /home/liveuser/.kde/share/config/kres-migratorrc << KRES_EOF
+[Migration]
+Enabled=false
+KRES_EOF
+
+# Disable kwallet migrator
+cat > /home/liveuser/.config/kwalletrc << KWALLET_EOL
+[Migration]
+alreadyMigrated=true
+KWALLET_EOL
+
+# Disable automount of 'known' devices
+# https://bugzilla.redhat.com/show_bug.cgi?id=2073708
+cat > /home/liveuser/.config/kded_device_automounterrc << AUTOMOUNTER_EOF
+[General]
+AutomountEnabled=false
+AutomountOnLogin=false
+AutomountOnPlugin=false
+AUTOMOUNTER_EOF
