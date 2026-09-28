@@ -8,7 +8,7 @@ if [[ ! -d "$ROOTFS" ]]; then
     exit 1
 fi
 
-dnf \
+sudo dnf \
     --installroot="$ROOTFS" \
     --releasever=44 \
     install -y fastfetch

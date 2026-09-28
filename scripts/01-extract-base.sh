@@ -35,7 +35,7 @@ echo "==> Preparing build workspace"
 
 sudo umount "$MNT_ROOT" 2>/dev/null || true
 
-rm -rf \
+sudo rm -rf \
     "$ISO_TREE" \
     "$ROOTFS" \
     "$BOOT_IMAGES"
