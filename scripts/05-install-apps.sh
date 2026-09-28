@@ -5,6 +5,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ROOTFS="${1:-$PROJECT_ROOT/iso/work/rootfs}"
 
 LIBREWOLF_REPO="$PROJECT_ROOT/packages/librewolf/librewolf.repo"
+LIBREWOLF_KEY="$PROJECT_ROOT/packages/librewolf/pubkey.gpg"
 LIVE_SESSION="$PROJECT_ROOT/plasma/livesys/livesys-kde"
 NVIDIA_HELPER="$PROJECT_ROOT/system/usr/local/sbin/octlitch-install-nvidia"
 
@@ -20,6 +21,12 @@ if [[ ! -f "$LIBREWOLF_REPO" ]]; then
     exit 1
 fi
 
+if [[ ! -f "$LIBREWOLF_KEY" ]]; then
+    echo "LibreWolf signing key missing:"
+    echo "  $LIBREWOLF_KEY"
+    exit 1
+fi
+
 if [[ ! -f "$LIVE_SESSION" ]]; then
     echo "Live session configuration missing:"
     echo "  $LIVE_SESSION"
@@ -32,6 +39,16 @@ if [[ ! -f "$NVIDIA_HELPER" ]]; then
     exit 1
 fi
 
+echo "==> Installing LibreWolf signing key"
+
+sudo install -Dm644 \
+    "$LIBREWOLF_KEY" \
+    "$ROOTFS/etc/pki/rpm-gpg/RPM-GPG-KEY-librewolf"
+
+sudo rpm \
+    --root "$ROOTFS" \
+    --import \
+    "$ROOTFS/etc/pki/rpm-gpg/RPM-GPG-KEY-librewolf"
 echo "==> Installing LibreWolf repository configuration"
 
 sudo install -Dm644 \
@@ -97,7 +114,6 @@ sudo dnf \
 
 sudo rm -rf \
     "$ROOTFS/var/cache/dnf" \
-    "$ROOTFS/var/cache/libdnf5"
 
 echo
 echo "Application installation complete."
