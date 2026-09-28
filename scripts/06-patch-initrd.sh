@@ -156,8 +156,11 @@ if ! grep -q '^Theme=octlitch$' <<< "$PLYMOUTH_CONFIG"; then
     exit 1
 fi
 
-if ! lsinitrd "$INITRD" \
-    | grep -q 'usr/share/plymouth/themes/octlitch/octlitch.plymouth'
+INITRD_LIST="$(lsinitrd "$INITRD")"
+
+if ! grep -Fq \
+    'usr/share/plymouth/themes/octlitch/octlitch.plymouth' \
+    <<< "$INITRD_LIST"
 then
     echo "Octlitch Plymouth theme is missing from rebuilt initrd."
     exit 1

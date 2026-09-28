@@ -1,0 +1,56 @@
+#!/bin/bash
+set -euo pipefail
+
+if [[ $EUID -ne 0 ]]; then
+    echo "Run this command as root:"
+    echo "  sudo octlitch-install-nvidia"
+    exit 1
+fi
+
+FEDORA_VERSION="$(rpm -E %fedora)"
+
+echo "Octlitch NVIDIA installer"
+echo "Fedora base: $FEDORA_VERSION"
+echo
+
+if ! lspci -nn | grep -qi 'NVIDIA'; then
+    echo "No NVIDIA PCI device was detected."
+    exit 1
+fi
+
+echo "==> Enabling RPM Fusion"
+
+dnf install -y \
+    "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VERSION}.noarch.rpm" \
+    "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VERSION}.noarch.rpm"
+
+echo "==> Updating package metadata"
+
+dnf makecache
+
+echo "==> Installing NVIDIA driver"
+
+dnf install -y \
+    akmod-nvidia \
+    xorg-x11-drv-nvidia \
+    xorg-x11-drv-nvidia-libs \
+    nvidia-settings
+
+echo "==> Building NVIDIA kernel module"
+
+akmods --force
+
+echo "==> Regenerating initramfs"
+
+dracut --force
+
+echo
+echo "NVIDIA packages installed."
+echo
+echo "Reboot after the akmod build has completed."
+echo
+echo "Verify after reboot with:"
+echo "  nvidia-smi"
+echo
+echo "If Secure Boot is enabled, the NVIDIA kernel module may require"
+echo "machine-owner-key enrollment before it can be loaded."

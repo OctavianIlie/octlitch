@@ -75,7 +75,7 @@ trap cleanup EXIT
 
 echo "==> Copying root filesystem"
 
-sudo cp -aHAX \
+sudo cp -aH \
     "$MNT_ROOT/." \
     "$ROOTFS/"
 
