@@ -1,4 +1,4 @@
-#Octlitch Linux
+##Octlitch Linux
 
 Octlitch is a Fedora-based Linux distribution built around KDE Plasma, that is heavily customized and bloat free. This distro is highly opinionated since ithas removed everything extra that's not needed. I believe that a OS should come as bare bones as it can and the user installs whatever he needs.
 
