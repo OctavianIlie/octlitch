@@ -13,11 +13,11 @@ sudo dnf \
     --releasever=44 \
     install -y fastfetch
 
-install -Dm644 \
+sudo install -Dm644 \
     branding/fastfetch/ascii.txt \
     "$ROOTFS/usr/share/octlitch/ascii.txt"
 
-install -Dm644 \
+sudo install -Dm644 \
     branding/fastfetch/config.jsonc \
     "$ROOTFS/etc/fastfetch/config.jsonc"
 
