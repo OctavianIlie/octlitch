@@ -184,9 +184,9 @@ GRUB_CFG="$ISO_TREE/boot/grub2/grub.cfg"
 
 if [[ -f "$GRUB_CFG" ]]; then
     sudo sed -i \
-        -e 's/Start Fedora-KDE-Live 44/Start Octlitch and install Octlitch/g' \
-        -e 's/Test this media & start Fedora-KDE-Live 44/Test this media \& start Octlitch/g' \
-        -e 's/Start Fedora-KDE-Live 44 in basic graphics mode/Start Octlitch in basic graphics mode/g' \
+        -e 's/Start Fedora-KDE-Desktop-Live in basic graphics mode/Start Octlitch in basic graphics mode/g' \
+        -e 's/Test this media & start Fedora-KDE-Desktop-Live/Test this media \& start Octlitch/g' \
+        -e 's/Start Fedora-KDE-Desktop-Live/Start Octlitch and install Octlitch/g' \
         "$GRUB_CFG"
 fi
 
