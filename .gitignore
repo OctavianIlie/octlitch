@@ -40,3 +40,7 @@ credentials/
 *~
 .DS_Store
 __pycache__/
+
+# Initrd patch workspace
+iso/work/initrd.fedora-backup
+iso/work/initrd-patch/
