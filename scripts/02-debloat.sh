@@ -64,7 +64,8 @@ remove_if_present \
     kio-gdrive \
     plasma-welcome-fedora \
     plasma-workspace-wallpapers \
-    plasma-welcome
+    plasma-welcome \
+    plasma-setup
 
 echo "==> Removing KDE PIM stack"
 remove_if_present \
