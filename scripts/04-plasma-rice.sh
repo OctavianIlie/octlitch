@@ -65,6 +65,10 @@ copy_file \
     "$PROJECT_ROOT/plasma/config/breezerc" \
     "$ROOTFS/etc/xdg/breezerc"
 
+copy_file \
+    "$PROJECT_ROOT/plasma/config/kscreenlockerrc" \
+    "$ROOTFS/etc/xdg/kscreenlockerrc"
+
 echo "==> Installing Octlitch color schemes"
 
 sudo mkdir -p "$ROOTFS/usr/share/color-schemes"
