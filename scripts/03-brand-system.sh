@@ -66,6 +66,16 @@ if [[ -f "$LIVEINST" ]]; then
         "$LIVEINST"
 fi
 
+echo "==> Branding Anaconda WebUI"
+
+sudo install -Dm644 \
+    "$PROJECT_ROOT/branding/anaconda/branding.css" \
+    "$ROOTFS/etc/cockpit/branding/branding.css"
+
+sudo install -Dm644 \
+    "$LOGO" \
+    "$ROOTFS/etc/cockpit/branding/logo.png"
+
 echo "==> Branding KDE Welcome Center"
 
 WELCOME="$ROOTFS/usr/share/applications/org.kde.plasma-welcome.desktop"
@@ -177,6 +187,22 @@ Theme=octlitch
 ShowDelay=0
 DeviceTimeout=8
 PLYMOUTHCONF
+
+echo "==> Configuring Anaconda WebUI"
+
+ANACONDA_CONF="$ROOTFS/etc/anaconda/anaconda.conf"
+
+if [[ -f "$ANACONDA_CONF" ]]; then
+    if grep -q '^webui_web_engine[[:space:]]*=' "$ANACONDA_CONF"; then
+        sudo sed -i \
+            's#^webui_web_engine[[:space:]]*=.*#webui_web_engine = /usr/local/bin/octlitch-installer-browser#' \
+            "$ANACONDA_CONF"
+    else
+        sudo sed -i \
+            '/^\[User Interface\]/a webui_web_engine = /usr/local/bin/octlitch-installer-browser' \
+            "$ANACONDA_CONF"
+    fi
+fi
 
 echo "==> Branding live boot menu"
 

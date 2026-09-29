@@ -155,6 +155,7 @@ if [[ -x "$ROOTFS/usr/bin/gtk-update-icon-cache" ]]; then
         >/dev/null 2>&1 || true
 fi
 
+
 echo
 echo "Octlitch Plasma rice installed."
 echo

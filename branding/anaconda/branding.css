@@ -1,0 +1,9 @@
+.anaconda {
+    --brand-default-light: #9b7cff;
+    --brand-default: #7850dc;
+    --brand-default-dark: #5635a6;
+}
+
+.anaconda .logo {
+    background-image: url("logo.png") !important;
+}

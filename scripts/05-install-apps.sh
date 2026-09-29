@@ -57,11 +57,41 @@ sudo install -Dm644 \
 
 echo "==> Installing LibreWolf"
 
-sudo dnf \
+if sudo dnf \
     --installroot="$ROOTFS" \
     --releasever=44 \
-    --setopt=install_weak_deps=False \
-    install -y librewolf
+    repoquery --repo=librewolf librewolf \
+    | grep -q '^librewolf'; then
+
+    sudo dnf \
+        --installroot="$ROOTFS" \
+        --releasever=44 \
+        install -y librewolf
+
+else
+    echo "LibreWolf repository metadata does not expose the package."
+    echo "Falling back to the official signed RPM."
+
+    LIBREWOLF_RPM_URL="https://repo.librewolf.net/pool/librewolf-156.0-1-linux-x86_64-rpm.rpm"
+    LIBREWOLF_RPM="/tmp/librewolf.rpm"
+
+    curl -fL \
+        "$LIBREWOLF_RPM_URL" \
+        -o "$LIBREWOLF_RPM"
+
+    sudo dnf \
+        --installroot="$ROOTFS" \
+        --releasever=44 \
+        install -y "$LIBREWOLF_RPM"
+
+    rm -f "$LIBREWOLF_RPM"
+fi
+
+echo "==> Installing Octlitch installer browser wrapper"
+
+sudo install -Dm755 \
+    "$PROJECT_ROOT/system/usr/local/bin/octlitch-installer-browser" \
+    "$ROOTFS/usr/local/bin/octlitch-installer-browser"
 
 echo "==> Installing Fastfetch and Octlitch branding"
 
