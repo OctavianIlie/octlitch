@@ -70,13 +70,27 @@ if sudo dnf \
 
 else
     echo "LibreWolf repository metadata does not expose the package."
-    echo "Falling back to the official signed RPM."
+    echo "Falling back to the newest official signed x86_64 RPM."
 
-    LIBREWOLF_RPM_URL="https://repo.librewolf.net/pool/librewolf-156.0-1-linux-x86_64-rpm.rpm"
+    LIBREWOLF_POOL="https://repo.librewolf.net/pool/"
     LIBREWOLF_RPM="/tmp/librewolf.rpm"
 
+    LIBREWOLF_RPM_NAME="$(
+        curl -fsSL "$LIBREWOLF_POOL" \
+        | grep -oE 'librewolf-[0-9][^"]*-linux-x86_64-rpm\.rpm' \
+        | sort -V \
+        | tail -n1
+    )"
+
+    if [[ -z "$LIBREWOLF_RPM_NAME" ]]; then
+        echo "Could not discover a LibreWolf x86_64 RPM."
+        exit 1
+    fi
+
+    echo "==> Downloading $LIBREWOLF_RPM_NAME"
+
     curl -fL \
-        "$LIBREWOLF_RPM_URL" \
+        "${LIBREWOLF_POOL}${LIBREWOLF_RPM_NAME}" \
         -o "$LIBREWOLF_RPM"
 
     sudo dnf \
