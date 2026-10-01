@@ -204,6 +204,21 @@ if [[ -f "$ANACONDA_CONF" ]]; then
     fi
 fi
 
+echo "==> Configuring Anaconda bootloader"
+
+ANACONDA_CONF="$ROOTFS/etc/anaconda/anaconda.conf"
+
+if [[ -f "$ANACONDA_CONF" ]]; then
+    if grep -q '^efi_dir[[:space:]]*=' "$ANACONDA_CONF"; then
+        sudo sed -i \
+            's#^efi_dir[[:space:]]*=.*#efi_dir = fedora#' \
+            "$ANACONDA_CONF"
+    else
+        sudo sed -i \
+            '/^\[Bootloader\]/a efi_dir = fedora' \
+            "$ANACONDA_CONF"
+    fi
+fi
 echo "==> Branding live boot menu"
 
 GRUB_CFG="$ISO_TREE/boot/grub2/grub.cfg"
@@ -215,6 +230,7 @@ if [[ -f "$GRUB_CFG" ]]; then
         -e 's/Start Fedora-KDE-Desktop-Live/Start Octlitch and install Octlitch/g' \
         "$GRUB_CFG"
 fi
+
 
 echo
 echo "System branding complete."

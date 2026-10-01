@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 MARKER="$HOME/.config/octlitch-first-login-done"
 
@@ -9,8 +10,14 @@ fi
 mkdir -p "$HOME/.config"
 
 plasma-apply-lookandfeel --apply org.octlitch.valley.desktop
+plasma-apply-wallpaperimage /usr/share/wallpapers/Octlitch/artificial-valley.jpg
 
-plasma-apply-wallpaperimage \
-  /usr/share/wallpapers/OctlitchValley/contents/images/artificial-valley.jpg
+KACTIVITY="$HOME/.config/kactivitymanagerd-statsrc"
+
+if [[ -f "$KACTIVITY" ]]; then
+    sed -i \
+        's/,org\.kde\.discover\.desktop//g; s/org\.kde\.discover\.desktop,//g; s/org\.kde\.discover\.desktop//g' \
+        "$KACTIVITY"
+fi
 
 touch "$MARKER"

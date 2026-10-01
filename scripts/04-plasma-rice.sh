@@ -70,8 +70,8 @@ copy_file \
     "$ROOTFS/etc/xdg/kscreenlockerrc"
 
 copy_file \
-    "$PROJECT_ROOT/plasma/config/kscreenlockerrc" \
-    "$ROOTFS/etc/xdg/kscreenlockerrc"
+    "$PROJECT_ROOT/plasma/config/plasmalogin.conf" \
+    "$ROOTFS/etc/plasmalogin.conf"
 
 echo "==> Installing Octlitch color schemes"
 
