@@ -44,6 +44,43 @@ remove_if_present() {
     "${DNF[@]}" remove -y "${installed[@]}"
 }
 
+remove_fedora_flatpak_remote() {
+    echo "==> Removing Fedora OCI Flatpak remote defaults"
+
+    local dirs=(
+        "$ROOTFS/etc/flatpak/remotes.d"
+        "$ROOTFS/usr/share/flatpak/remotes.d"
+    )
+
+    local dir
+    local file
+    local removed=0
+
+    for dir in "${dirs[@]}"; do
+        [[ -d "$dir" ]] || continue
+
+        while IFS= read -r -d '' file; do
+            if sudo grep -Eq \
+                'registry\.fedoraproject\.org|oci\+https://registry\.fedoraproject\.org' \
+                "$file"; then
+
+                echo "    Removing ${file#$ROOTFS}"
+                sudo rm -f "$file"
+                removed=1
+            fi
+        done < <(
+            sudo find "$dir" \
+                -maxdepth 1 \
+                -type f \
+                -print0
+        )
+    done
+
+    if (( removed == 0 )); then
+        echo "    No Fedora OCI Flatpak remote definition found."
+    fi
+}
+
 echo "==> Removing browser and office suite"
 
 remove_if_present \
@@ -204,6 +241,10 @@ if [[ "$KWIN_VERSION" != "$PLASMA_LOGIN_VERSION" ]]; then
 fi
 
 echo "    Plasma versions are aligned."
+
+# Do this AFTER distro-sync so Fedora package updates cannot restore
+# the Fedora OCI Flatpak remote definition afterward.
+remove_fedora_flatpak_remote
 
 echo "==> Cleaning package metadata and caches"
 
