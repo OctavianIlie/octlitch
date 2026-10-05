@@ -101,6 +101,16 @@ else
     rm -f "$LIBREWOLF_RPM"
 fi
 
+echo "==> Installing Discover with Flatpak backend"
+
+sudo dnf \
+    --installroot="$ROOTFS" \
+    --releasever=44 \
+    install -y \
+    --setopt=install_weak_deps=False \
+    plasma-discover \
+    plasma-discover-flatpak
+
 echo "==> Installing Octlitch installer browser wrapper"
 
 sudo install -Dm755 \

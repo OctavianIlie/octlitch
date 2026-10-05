@@ -31,9 +31,54 @@ fi
 
 echo "Checksum OK."
 
-echo "==> Preparing build workspace"
+echo "==> Cleaning stale build mounts"
 
-sudo umount "$MNT_ROOT" 2>/dev/null || true
+# Unmount the temporary Fedora root mount if it was left behind.
+if mountpoint -q "$MNT_ROOT" 2>/dev/null; then
+    echo "Unmounting stale mount: $MNT_ROOT"
+    sudo umount -l "$MNT_ROOT"
+fi
+
+# Unmount anything accidentally left mounted inside the rootfs.
+if [[ -d "$ROOTFS" ]]; then
+    mapfile -t ROOTFS_MOUNTS < <(
+        findmnt -rn -o TARGET |
+        awk -v root="$ROOTFS" '
+            $0 == root || index($0, root "/") == 1 {
+                depth = gsub(/\//, "/")
+                print depth "\t" $0
+            }
+        ' |
+        sort -rn |
+        cut -f2-
+    )
+
+    for mount_target in "${ROOTFS_MOUNTS[@]}"; do
+        [[ -n "$mount_target" ]] || continue
+        echo "Unmounting stale mount: $mount_target"
+        sudo umount -l "$mount_target" || true
+    done
+fi
+
+# Safety check: never rm the rootfs while something remains mounted under it.
+REMAINING_MOUNTS="$(
+    findmnt -rn -o TARGET |
+    awk -v root="$ROOTFS" '
+        $0 == root || index($0, root "/") == 1 {
+            print
+        }
+    '
+)"
+
+if [[ -n "$REMAINING_MOUNTS" ]]; then
+    echo "ERROR: mounts still exist underneath the rootfs:"
+    printf '%s\n' "$REMAINING_MOUNTS"
+    echo
+    echo "Refusing to delete the rootfs."
+    exit 1
+fi
+
+echo "==> Preparing build workspace"
 
 sudo rm -rf \
     "$ISO_TREE" \
@@ -68,7 +113,9 @@ sudo mount \
     "$MNT_ROOT"
 
 cleanup() {
-    sudo umount "$MNT_ROOT" 2>/dev/null || true
+    if mountpoint -q "$MNT_ROOT" 2>/dev/null; then
+        sudo umount "$MNT_ROOT" 2>/dev/null || true
+    fi
 }
 
 trap cleanup EXIT

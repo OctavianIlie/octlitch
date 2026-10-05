@@ -26,8 +26,8 @@ remove_if_present() {
                 [[ -n "$match" ]] && installed+=("$match")
             done < <(
                 sudo chroot "$ROOTFS" rpm -qa \
-                | grep -E "^${pkg//\*/.*}($|-)" \
-                || true
+                    | grep -E "^${pkg//\*/.*}($|-)" \
+                    || true
             )
         else
             if sudo chroot "$ROOTFS" rpm -q "$pkg" >/dev/null 2>&1; then
@@ -45,12 +45,14 @@ remove_if_present() {
 }
 
 echo "==> Removing browser and office suite"
+
 remove_if_present \
     firefox \
     firefox-langpacks \
     'libreoffice*'
 
 echo "==> Removing games"
+
 remove_if_present \
     kpat \
     kmines \
@@ -59,6 +61,7 @@ remove_if_present \
     libkmahjongg-data
 
 echo "==> Removing optional KDE applications"
+
 remove_if_present \
     neochat \
     kio-gdrive \
@@ -68,6 +71,7 @@ remove_if_present \
     plasma-setup
 
 echo "==> Removing KDE PIM stack"
+
 remove_if_present \
     'akonadi*' \
     'akregator*' \
@@ -89,6 +93,7 @@ remove_if_present \
     'pim-sieve-editor*'
 
 echo "==> Removing Discover stack"
+
 remove_if_present \
     plasma-discover \
     plasma-discover-notifier \
@@ -98,6 +103,7 @@ remove_if_present \
     plasma-discover-offline-updates
 
 echo "==> Removing heavy/unused desktop components"
+
 remove_if_present \
     qt6-qtwebengine \
     qt6-qtwebview \
@@ -110,6 +116,7 @@ remove_if_present \
     kleopatra
 
 echo "==> Removing container/server/Java stack"
+
 remove_if_present \
     toolbox \
     podman \
@@ -132,6 +139,71 @@ remove_if_present \
     java-25-openjdk-crypto-adapter \
     java-25-openjdk-headless \
     javapackages-filesystem
+
+echo "==> Synchronizing remaining Fedora packages"
+
+"${DNF[@]}" \
+    --refresh \
+    distro-sync -y
+
+echo "==> Verifying Plasma package alignment"
+
+KWIN_VERSION="$(
+    sudo chroot "$ROOTFS" \
+        rpm -q --qf '%{VERSION}\n' kwin
+)"
+
+KSCREENLOCKER_VERSION="$(
+    sudo chroot "$ROOTFS" \
+        rpm -q --qf '%{VERSION}\n' kscreenlocker
+)"
+
+PLASMA_WORKSPACE_VERSION="$(
+    sudo chroot "$ROOTFS" \
+        rpm -q --qf '%{VERSION}\n' plasma-workspace
+)"
+
+PLASMA_LOGIN_VERSION="$(
+    sudo chroot "$ROOTFS" \
+        rpm -q --qf '%{VERSION}\n' plasma-login-manager
+)"
+
+echo "    KWin:                 $KWIN_VERSION"
+echo "    KScreenLocker:        $KSCREENLOCKER_VERSION"
+echo "    Plasma Workspace:     $PLASMA_WORKSPACE_VERSION"
+echo "    Plasma Login Manager: $PLASMA_LOGIN_VERSION"
+
+if [[ "$KWIN_VERSION" != "$KSCREENLOCKER_VERSION" ]]; then
+    echo
+    echo "ERROR: Plasma package mismatch detected."
+    echo "KWin:          $KWIN_VERSION"
+    echo "KScreenLocker: $KSCREENLOCKER_VERSION"
+    echo
+    echo "Refusing to continue with an inconsistent Plasma stack."
+    exit 1
+fi
+
+if [[ "$KWIN_VERSION" != "$PLASMA_WORKSPACE_VERSION" ]]; then
+    echo
+    echo "ERROR: Plasma package mismatch detected."
+    echo "KWin:             $KWIN_VERSION"
+    echo "Plasma Workspace: $PLASMA_WORKSPACE_VERSION"
+    echo
+    echo "Refusing to continue with an inconsistent Plasma stack."
+    exit 1
+fi
+
+if [[ "$KWIN_VERSION" != "$PLASMA_LOGIN_VERSION" ]]; then
+    echo
+    echo "ERROR: Plasma package mismatch detected."
+    echo "KWin:                 $KWIN_VERSION"
+    echo "Plasma Login Manager: $PLASMA_LOGIN_VERSION"
+    echo
+    echo "Refusing to continue with an inconsistent Plasma stack."
+    exit 1
+fi
+
+echo "    Plasma versions are aligned."
 
 echo "==> Cleaning package metadata and caches"
 
