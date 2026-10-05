@@ -36,7 +36,17 @@ LOGO=octlitch-logo
 DEFAULT_HOSTNAME=octlitch
 VARIANT="KDE Plasma"
 VARIANT_ID=kde
+HOME_URL="https://octlitch.com/"
+DOCUMENTATION_URL="https://octlitch.com/documentation/"
+SUPPORT_URL="https://octlitch.com/documentation/troubleshooting/"
+BUG_REPORT_URL="https://github.com/OctavianIlie/octlitch/issues"
 OSRELEASE
+
+echo "==> Installing Octlitch credits"
+
+sudo install -Dm644 \
+    "$PROJECT_ROOT/CREDITS.md" \
+    "$ROOTFS/usr/share/doc/octlitch/CREDITS.md"
 
 echo "octlitch" | sudo tee "$ROOTFS/etc/hostname" >/dev/null
 
