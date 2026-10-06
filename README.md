@@ -2,7 +2,7 @@
 
 Octlitch is a Fedora-based Linux distribution built around KDE Plasma.
 
-It is heavily customized, intentionally minimal, and highly opinionated. The goal is to ship a clean base system without unnecessary preinstalled software, so users can install only what they actually want.
+It is heavily customized, intentionally minimal, and highly opinionated. I consider an operating system should have clean base system without unnecessary preinstalled software, so users can install only what they actually want.
 
 Octlitch keeps Fedora's underlying security and system infrastructure while replacing the default desktop experience with Octlitch branding, themes, defaults, and tooling.
 
