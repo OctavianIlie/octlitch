@@ -137,6 +137,27 @@ copy_file \
     "$PROJECT_ROOT/plasma/autostart/octlitch-first-login.desktop" \
     "$ROOTFS/etc/xdg/autostart/octlitch-first-login.desktop"
 
+echo "==> Installing Octlitch lockscreen synchronization"
+
+copy_exec \
+    "$PROJECT_ROOT/plasma/bin/octlitch-sync-lockscreen" \
+    "$ROOTFS/usr/local/bin/octlitch-sync-lockscreen"
+
+copy_file \
+    "$PROJECT_ROOT/plasma/systemd/octlitch-lockscreen-sync.service" \
+    "$ROOTFS/usr/lib/systemd/user/octlitch-lockscreen-sync.service"
+
+copy_file \
+    "$PROJECT_ROOT/plasma/systemd/octlitch-lockscreen-sync.path" \
+    "$ROOTFS/usr/lib/systemd/user/octlitch-lockscreen-sync.path"
+
+sudo mkdir -p \
+    "$ROOTFS/etc/systemd/user/default.target.wants"
+
+sudo ln -sfn \
+    /usr/lib/systemd/user/octlitch-lockscreen-sync.path \
+    "$ROOTFS/etc/systemd/user/default.target.wants/octlitch-lockscreen-sync.path"
+
 echo "==> Setting compact default Plasma panel"
 
 LAYOUT="$ROOTFS/usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js"

@@ -12,6 +12,25 @@ mkdir -p "$HOME/.config"
 plasma-apply-lookandfeel --apply org.octlitch.valley.desktop
 plasma-apply-wallpaperimage /usr/share/wallpapers/Octlitch/artificial-valley.jpg
 
+# Set the default Octlitch lockscreen wallpaper.
+kwriteconfig6 \
+    --file kscreenlockerrc \
+    --group Greeter \
+    --group Wallpaper \
+    --group org.kde.image \
+    --group General \
+    --key Image \
+    "file:///usr/share/wallpapers/Octlitch/artificial-valley.jpg"
+
+kwriteconfig6 \
+    --file kscreenlockerrc \
+    --group Greeter \
+    --group Wallpaper \
+    --group org.kde.image \
+    --group General \
+    --key PreviewImage \
+    "file:///usr/share/wallpapers/Octlitch/artificial-valley.jpg"
+
 KACTIVITY="$HOME/.config/kactivitymanagerd-statsrc"
 
 if [[ -f "$KACTIVITY" ]]; then

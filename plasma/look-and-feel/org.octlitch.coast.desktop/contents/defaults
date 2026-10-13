@@ -11,7 +11,7 @@ Theme=breeze-dark
 name=default
 
 [Wallpaper]
-Image=/usr/share/wallpapers/OctlitchCoast/contents/images/beach-path.jpg
+Image=/usr/share/wallpapers/Octlitch/beach-path.jpg
 
 [kcminputrc][Mouse]
 cursorTheme=breeze_cursors

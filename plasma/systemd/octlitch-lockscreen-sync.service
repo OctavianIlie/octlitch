@@ -1,0 +1,6 @@
+[Unit]
+Description=Synchronize Octlitch lockscreen wallpaper
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/octlitch-sync-lockscreen

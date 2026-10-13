@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch for Octlitch global theme changes
+
+[Path]
+PathChanged=%h/.config/kdeglobals
+Unit=octlitch-lockscreen-sync.service
+
+[Install]
+WantedBy=default.target

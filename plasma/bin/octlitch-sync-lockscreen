@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+command -v kreadconfig6 >/dev/null || exit 0
+command -v kwriteconfig6 >/dev/null || exit 0
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+STATE_FILE="$CONFIG_DIR/octlitch-lockscreen-theme"
+
+THEME="$(
+    kreadconfig6 \
+        --file kdeglobals \
+        --group KDE \
+        --key LookAndFeelPackage
+)"
+
+case "$THEME" in
+    org.octlitch.valley.desktop)
+        WALLPAPER="artificial-valley.jpg"
+        ;;
+    org.octlitch.model.desktop)
+        WALLPAPER="3d-model.jpg"
+        ;;
+    org.octlitch.coast.desktop)
+        WALLPAPER="beach-path.jpg"
+        ;;
+    org.octlitch.mountain.desktop)
+        WALLPAPER="Mountain.jpg"
+        ;;
+    *)
+        # Ignore themes not owned by Octlitch.
+        exit 0
+        ;;
+esac
+
+IMAGE="/usr/share/wallpapers/Octlitch/$WALLPAPER"
+
+if [[ ! -f "$IMAGE" ]]; then
+    echo "Wallpaper not found: $IMAGE" >&2
+    exit 1
+fi
+
+# Do nothing unless the selected theme has changed.
+if [[ -f "$STATE_FILE" ]] &&
+   [[ "$(cat "$STATE_FILE")" == "$THEME" ]]; then
+    exit 0
+fi
+
+URL="file://$IMAGE"
+
+for KEY in Image PreviewImage; do
+    kwriteconfig6 \
+        --file kscreenlockerrc \
+        --group Greeter \
+        --group Wallpaper \
+        --group org.kde.image \
+        --group General \
+        --key "$KEY" \
+        "$URL"
+done
+
+mkdir -p "$CONFIG_DIR"
+printf '%s\n' "$THEME" > "$STATE_FILE"
+
+echo "Octlitch lockscreen synchronized: $THEME"

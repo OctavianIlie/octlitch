@@ -11,7 +11,7 @@ Theme=breeze-dark
 name=default
 
 [Wallpaper]
-Image=/usr/share/wallpapers/OctlitchMountain/contents/images/Mountain.jpg
+Image=/usr/share/wallpapers/Octlitch/Mountain.jpg
 
 [kcminputrc][Mouse]
 cursorTheme=breeze_cursors
