@@ -29,6 +29,29 @@ fi
 mkdir -p "$OUTPUT_DIR"
 
 echo "==> Building LZMA EROFS"
+echo "==> Verifying Octlitch desktop installation"
+
+REQUIRED_FILES=(
+    "$ROOTFS/usr/local/bin/octlitch-first-login"
+    "$ROOTFS/usr/local/bin/octlitch-sync-lockscreen"
+    "$ROOTFS/etc/xdg/kdeglobals"
+    "$ROOTFS/etc/xdg/kscreenlockerrc"
+    "$ROOTFS/usr/share/plasma/look-and-feel/org.octlitch.valley.desktop/contents/defaults"
+    "$ROOTFS/usr/share/plasma/look-and-feel/org.octlitch.model.desktop/contents/defaults"
+    "$ROOTFS/usr/share/plasma/look-and-feel/org.octlitch.coast.desktop/contents/defaults"
+    "$ROOTFS/usr/share/plasma/look-and-feel/org.octlitch.mountain.desktop/contents/defaults"
+    "$ROOTFS/usr/share/wallpapers/Octlitch/artificial-valley.jpg"
+)
+
+for required in "${REQUIRED_FILES[@]}"; do
+    if [[ ! -s "$required" ]]; then
+        echo "ERROR: Missing or empty Octlitch component:"
+        echo "  $required"
+        exit 1
+    fi
+done
+
+echo "Octlitch desktop verification passed."
 
 sudo rm -f "$EROFS"
 

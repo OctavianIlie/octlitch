@@ -15,6 +15,30 @@ STAGES=(
     scripts/07-build-iso.sh
 )
 
+echo "==> Validating build scripts"
+
+for stage in "${STAGES[@]}"; do
+    if [[ ! -s "$PROJECT_ROOT/$stage" ]]; then
+        echo "ERROR: Missing or empty build stage: $stage"
+        exit 1
+    fi
+
+    if ! bash -n "$PROJECT_ROOT/$stage"; then
+        echo "ERROR: Invalid Bash syntax: $stage"
+        exit 1
+    fi
+done
+
+for required in \
+    plasma/bin/octlitch-first-login \
+    plasma/bin/octlitch-sync-lockscreen
+do
+    if [[ ! -s "$PROJECT_ROOT/$required" ]]; then
+        echo "ERROR: Missing or empty file: $required"
+        exit 1
+    fi
+done
+
 echo "======================================"
 echo "         Octlitch ISO Builder"
 echo "======================================"
